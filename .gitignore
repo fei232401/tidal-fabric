@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# 实验输出（大文件归档进 docs/results/ 才入库，裸输出忽略）
+results/raw/
+*.h5
+*.pt
+*.bin
+
+# 日志
+logs/
+*.log
+
+# 系统
+.DS_Store

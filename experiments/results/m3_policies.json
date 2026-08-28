@@ -1,0 +1,354 @@
+{
+  "config": {
+    "spine_rate_GBs": 30.0,
+    "grad_MB": 100,
+    "kv_deadline_ms": 20.0,
+    "windows": [
+      [
+        0.0,
+        3.0,
+        2.0
+      ],
+      [
+        3.0,
+        7.0,
+        12.0
+      ],
+      [
+        7.0,
+        10.0,
+        2.0
+      ]
+    ],
+    "duration_s": 10.0,
+    "seed": 42,
+    "ctrl": {
+      "monitor_window": 0.5,
+      "min_samples": 3,
+      "min_interval": 0.3,
+      "hold_healthy": 1.0,
+      "healthy_ratio": 0.95,
+      "cap_levels": "(None, 12500000000.0, 6250000000.0, 3125000000.0)",
+      "min_ranks": 2,
+      "rebuild_time": 0.05
+    }
+  },
+  "scenarios": {
+    "ring_only": {
+      "delivered_chunks": 500364,
+      "pfc_pause_episodes": 0,
+      "ring": {
+        "steps": 1667,
+        "progress_MB": 1000200.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 1.0
+      }
+    },
+    "none": {
+      "delivered_chunks": 548760,
+      "pfc_pause_episodes": 3280,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 18.123,
+        "p95_ms": 33.532,
+        "violation_rate": 0.2388
+      },
+      "ring": {
+        "steps": 1600,
+        "progress_MB": 960000.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.96
+      }
+    },
+    "static_cap25": {
+      "delivered_chunks": 199392,
+      "pfc_pause_episodes": 106,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 11.433,
+        "p95_ms": 18.342,
+        "violation_rate": 0.0448
+      },
+      "ring": {
+        "steps": 435,
+        "progress_MB": 261000.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.261
+      }
+    },
+    "gpu_only": {
+      "delivered_chunks": 352147,
+      "pfc_pause_episodes": 3057,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 17.869,
+        "p95_ms": 32.662,
+        "violation_rate": 0.2388
+      },
+      "ring": {
+        "steps": 2134,
+        "progress_MB": 566200.0,
+        "rebuilds": 2,
+        "stall_ms": 100.0,
+        "progress_ratio": 0.566
+      },
+      "ctrl": {
+        "actions": 2,
+        "direction_changes": 0,
+        "timeline": [
+          [
+            1.0,
+            "concede",
+            "remove=s3_0 n=3"
+          ],
+          [
+            3.5,
+            "concede",
+            "remove=s2_0 n=2"
+          ]
+        ]
+      }
+    },
+    "net_aware": {
+      "delivered_chunks": 277420,
+      "pfc_pause_episodes": 958,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 14.559,
+        "p95_ms": 23.918,
+        "violation_rate": 0.1343
+      },
+      "ring": {
+        "steps": 696,
+        "progress_MB": 417600.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.418
+      },
+      "ctrl": {
+        "actions": 5,
+        "direction_changes": 3,
+        "timeline": [
+          [
+            1.0,
+            "concede",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            3.5,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            5.5,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            6.0,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            10.0,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ]
+        ]
+      }
+    },
+    "net_aware_d200": {
+      "delivered_chunks": 266044,
+      "pfc_pause_episodes": 958,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 14.559,
+        "p95_ms": 23.918,
+        "violation_rate": 0.1343
+      },
+      "ring": {
+        "steps": 658,
+        "progress_MB": 394800.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.395
+      },
+      "ctrl": {
+        "actions": 4,
+        "direction_changes": 2,
+        "timeline": [
+          [
+            1.0,
+            "concede",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            3.5,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            5.5,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            6.0,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ]
+        ]
+      }
+    },
+    "net_aware_d500": {
+      "delivered_chunks": 308608,
+      "pfc_pause_episodes": 884,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 12.84,
+        "p95_ms": 23.778,
+        "violation_rate": 0.0896
+      },
+      "ring": {
+        "steps": 800,
+        "progress_MB": 480000.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.48
+      },
+      "ctrl": {
+        "actions": 5,
+        "direction_changes": 1,
+        "timeline": [
+          [
+            1.5,
+            "concede",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            4.0,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            4.5,
+            "concede",
+            "cap_idx=3 cap=3125000000.0"
+          ],
+          [
+            6.0,
+            "restore",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            7.5,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ]
+        ]
+      }
+    },
+    "fast_tide": {
+      "delivered_chunks": 364856,
+      "pfc_pause_episodes": 1228,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 14.843,
+        "p95_ms": 23.083,
+        "violation_rate": 0.1045
+      },
+      "ring": {
+        "steps": 987,
+        "progress_MB": 592200.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.592
+      },
+      "ctrl": {
+        "actions": 4,
+        "direction_changes": 1,
+        "timeline": [
+          [
+            1.0,
+            "concede",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            2.5,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            6.5,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            8.0,
+            "restore",
+            "cap_idx=0 cap=None"
+          ]
+        ]
+      }
+    },
+    "fast_tide_d500": {
+      "delivered_chunks": 273704,
+      "pfc_pause_episodes": 849,
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 11.447,
+        "p95_ms": 23.678,
+        "violation_rate": 0.1045
+      },
+      "ring": {
+        "steps": 683,
+        "progress_MB": 409800.0,
+        "rebuilds": 0,
+        "stall_ms": 0.0,
+        "progress_ratio": 0.41
+      },
+      "ctrl": {
+        "actions": 5,
+        "direction_changes": 1,
+        "timeline": [
+          [
+            1.5,
+            "concede",
+            "cap_idx=1 cap=12500000000.0"
+          ],
+          [
+            3.0,
+            "concede",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            3.5,
+            "concede",
+            "cap_idx=3 cap=3125000000.0"
+          ],
+          [
+            7.0,
+            "restore",
+            "cap_idx=2 cap=6250000000.0"
+          ],
+          [
+            8.5,
+            "restore",
+            "cap_idx=1 cap=12500000000.0"
+          ]
+        ]
+      }
+    }
+  }
+}

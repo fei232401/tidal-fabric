@@ -1,0 +1,240 @@
+{
+  "config": {
+    "spine_rate_GBs": 30.0,
+    "grad_bytes_MB": 100,
+    "ring_chunk_MB": 2,
+    "kv_bytes_MB": 256,
+    "kv_chunk_KB": 256,
+    "kv_deadline_ms": 20.0,
+    "windows": [
+      [
+        0.0,
+        3.0,
+        2.0
+      ],
+      [
+        3.0,
+        7.0,
+        12.0
+      ],
+      [
+        7.0,
+        10.0,
+        2.0
+      ]
+    ],
+    "duration_s": 10.0,
+    "seed": 42,
+    "caps_GBs": {
+      "cap_75": 18.75,
+      "cap_50": 12.5,
+      "cap_25": 6.25
+    }
+  },
+  "scenarios": {
+    "kv_only": {
+      "delivered_chunks": 68608,
+      "pfc": {
+        "pause_episodes": 0,
+        "storms": 0,
+        "max_paused_ms": 0.0
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 10.845,
+        "p95_ms": 17.091,
+        "p99_ms": 19.919,
+        "violation_rate": 0.0149
+      }
+    },
+    "ring_only": {
+      "delivered_chunks": 500364,
+      "pfc": {
+        "pause_episodes": 0,
+        "storms": 0,
+        "max_paused_ms": 0.0
+      },
+      "ring": {
+        "steps": 1667,
+        "step_mean_ms": 6.595,
+        "step_p95_ms": 6.595,
+        "slowdown_vs_ring_only": 1.0
+      }
+    },
+    "colocated": {
+      "delivered_chunks": 548760,
+      "pfc": {
+        "pause_episodes": 3280,
+        "storms": 0,
+        "max_paused_ms": 482.271
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 18.123,
+        "p95_ms": 33.532,
+        "p99_ms": 35.918,
+        "violation_rate": 0.2388
+      },
+      "ring": {
+        "steps": 1600,
+        "step_mean_ms": 6.873,
+        "step_p95_ms": 9.908,
+        "slowdown_vs_ring_only": 1.042
+      }
+    },
+    "cap_75": {
+      "delivered_chunks": 442264,
+      "pfc": {
+        "pause_episodes": 3051,
+        "storms": 0,
+        "max_paused_ms": 455.567
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 17.913,
+        "p95_ms": 33.124,
+        "p99_ms": 35.312,
+        "violation_rate": 0.2388
+      },
+      "ring": {
+        "steps": 1245,
+        "step_mean_ms": 8.832,
+        "step_p95_ms": 10.486,
+        "slowdown_vs_ring_only": 1.339
+      }
+    },
+    "cap_50": {
+      "delivered_chunks": 325756,
+      "pfc": {
+        "pause_episodes": 1729,
+        "storms": 0,
+        "max_paused_ms": 252.417
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 14.886,
+        "p95_ms": 26.702,
+        "p99_ms": 28.693,
+        "violation_rate": 0.1493
+      },
+      "ring": {
+        "steps": 857,
+        "step_mean_ms": 12.833,
+        "step_p95_ms": 13.133,
+        "slowdown_vs_ring_only": 1.946
+      }
+    },
+    "cap_25": {
+      "delivered_chunks": 199392,
+      "pfc": {
+        "pause_episodes": 106,
+        "storms": 0,
+        "max_paused_ms": 15.618
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 11.433,
+        "p95_ms": 18.342,
+        "p99_ms": 21.021,
+        "violation_rate": 0.0448
+      },
+      "ring": {
+        "steps": 435,
+        "step_mean_ms": 25.232,
+        "step_p95_ms": 25.362,
+        "slowdown_vs_ring_only": 3.826
+      }
+    }
+  },
+  "sensitivity": {
+    "kv_128K": {
+      "delivered_chunks": 617460,
+      "pfc": {
+        "pause_episodes": 3322,
+        "storms": 0,
+        "max_paused_ms": 482.562
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 18.372,
+        "p95_ms": 33.834,
+        "p99_ms": 36.351,
+        "violation_rate": 0.2687
+      },
+      "ring": {
+        "steps": 1600,
+        "step_mean_ms": 6.872,
+        "step_p95_ms": 9.942
+      }
+    },
+    "kv_512K": {
+      "delivered_chunks": 514356,
+      "pfc": {
+        "pause_episodes": 3230,
+        "storms": 0,
+        "max_paused_ms": 483.889
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 18.039,
+        "p95_ms": 33.594,
+        "p99_ms": 36.042,
+        "violation_rate": 0.2388
+      },
+      "ring": {
+        "steps": 1600,
+        "step_mean_ms": 6.874,
+        "step_p95_ms": 9.874
+      }
+    },
+    "ring_1M": {
+      "delivered_chunks": 1043116,
+      "pfc": {
+        "pause_episodes": 3690,
+        "storms": 0,
+        "max_paused_ms": 432.148
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 17.358,
+        "p95_ms": 31.379,
+        "p99_ms": 34.13,
+        "violation_rate": 0.2239
+      },
+      "ring": {
+        "steps": 1624,
+        "step_mean_ms": 6.773,
+        "step_p95_ms": 9.66
+      }
+    },
+    "ring_4M": {
+      "delivered_chunks": 305664,
+      "pfc": {
+        "pause_episodes": 3490,
+        "storms": 0,
+        "max_paused_ms": 658.972
+      },
+      "kv": {
+        "count": 67,
+        "pending": 0,
+        "p50_ms": 21.191,
+        "p95_ms": 42.315,
+        "p99_ms": 48.924,
+        "violation_rate": 1.0
+      },
+      "ring": {
+        "steps": 1559,
+        "step_mean_ms": 7.053,
+        "step_p95_ms": 9.236
+      }
+    }
+  }
+}
