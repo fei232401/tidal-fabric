@@ -18,11 +18,11 @@ import torch
 import torch.distributed as dist
 from datetime import timedelta
 
-KV_BYTES = 128 * 1024 * 1024      # 128MB/块(KV 搬运代理)
+KV_BYTES = 128 * 1024 * 1024
 KV_BLOCKS = 40
 TRAIN_ITERS = 2000
-TRAIN_ELEMS = 32 * 1024 * 1024    # 128MB fp32 all_reduce(训练梯度代理)
-TRAIN_SLEEP = 0.004               # colocated_cap:限速 pacing(秒/迭代)
+TRAIN_ELEMS = 32 * 1024 * 1024
+TRAIN_SLEEP = 0.004
 
 
 def kv_loop(rank, log):
@@ -69,7 +69,6 @@ def main():
             train_loop(rank, g)
             th.join()
         else:
-            # rank1:KV 接收计时为主线程,训练为子线程(对称)
             import threading
             th = threading.Thread(target=train_loop, args=(rank, g))
             th.start()

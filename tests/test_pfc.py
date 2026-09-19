@@ -13,8 +13,8 @@ MB = 1024 * 1024
 def test_pfc_backpressure_first_hop():
     """两源挤一条较慢上联:上联队列越过 xoff → 两个源 NIC 都被 PAUSE。"""
     topo = CLOS(n_leaf=2, n_spine=1, servers_per_leaf=2,
-                server_rate=25e9, spine_rate=30e9)   # 入 50 > 出 30
-    sim = Simulator(topo, watchdog_threshold=1e9)    # 关闭 watchdog 噪声
+                server_rate=25e9, spine_rate=30e9)
+    sim = Simulator(topo, watchdog_threshold=1e9)
     BulkFlow(sim, "a", "s0_0", "s1_0", 64 * MB)
     BulkFlow(sim, "b", "s0_1", "s1_1", 64 * MB)
     for f in sim.flows.values():
@@ -27,7 +27,7 @@ def test_pfc_backpressure_first_hop():
     assert nic_a.stats.pauses_received >= 1
     assert nic_b.stats.pauses_received >= 1
     assert nic_a.stats.paused_total > 0
-    assert uplink.stats.pause_frames_sent >= 2      # 两条来路各至少一帧
+    assert uplink.stats.pause_frames_sent >= 2
     assert uplink.stats.max_occupancy >= uplink.xoff
 
 
@@ -39,7 +39,7 @@ def test_pfc_multihop_backpressure_chain():
     的系统扫描是 M4(H3 主战场)的工作。
     """
     topo = CLOS(n_leaf=2, n_spine=1, servers_per_leaf=3,
-                server_rate=10e9, spine_rate=50e9)   # 3×10 入,10 出
+                server_rate=10e9, spine_rate=50e9)
     sim = Simulator(topo)
     for i in range(3):
         BulkFlow(sim, f"f{i}", f"s0_{i}", "s1_0", 64 * MB)
@@ -47,11 +47,8 @@ def test_pfc_multihop_backpressure_chain():
         f.start()
     sim.run(until=60.0)
     assert all(f.done for f in sim.flows.values())
-    # 拥塞起源:leaf1 出口队列触发 PAUSE
     assert sim.queue("L1->s1_0").stats.pause_frames_sent >= 1
-    # 反压第二级:spine 出口队列被压
     assert sim.queue("S0->L1").stats.pauses_received >= 1
-    # 反压第三级:leaf0 上联队列被压
     assert sim.queue("L0->S0").stats.pauses_received >= 1
 
 
@@ -62,15 +59,15 @@ def test_watchdog_storm_detection():
     spine 出口队列(S0->L1)——storm 记在被暂停的队列上,持续时长 =
     起源队列 xoff→xon 排空时间(4.8MB/25GB/s = 192µs > 100µs 阈值)。
     """
-    topo = CLOS(n_leaf=2, n_spine=1, servers_per_leaf=2)  # 25 接入/50 上联
-    sim = Simulator(topo, watchdog_threshold=100e-6)      # 100µs 阈值
+    topo = CLOS(n_leaf=2, n_spine=1, servers_per_leaf=2)
+    sim = Simulator(topo, watchdog_threshold=100e-6)
     BulkFlow(sim, "a", "s0_0", "s1_0", 64 * MB)
-    BulkFlow(sim, "b", "s0_1", "s1_0", 64 * MB)           # 同目的地 → 出口 25 入 50
+    BulkFlow(sim, "b", "s0_1", "s1_0", 64 * MB)
     for f in sim.flows.values():
         f.start()
     sim.run(until=60.0)
     assert all(f.done for f in sim.flows.values())
-    assert sim.queue("L1->s1_0").stats.pause_frames_sent >= 1   # 起源确实发了 PAUSE
-    assert sim.queue("S0->L1").stats.pauses_received >= 1       # S0 出口确实被压
-    assert sim.queue("S0->L1").stats.storms >= 1                # 被压时长超阈值 → storm
+    assert sim.queue("L1->s1_0").stats.pause_frames_sent >= 1
+    assert sim.queue("S0->L1").stats.pauses_received >= 1
+    assert sim.queue("S0->L1").stats.storms >= 1
     assert sim.metrics.storms >= 1

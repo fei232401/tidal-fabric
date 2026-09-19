@@ -15,20 +15,18 @@ from tidal_fabric.workloads import ring_segment_paths
 
 MB = 1024 * 1024
 
-# (fid, src, dst, path) —— 显式路径的七条流
 _FLOW_SPECS = [
     ("f1", "s0_0", "s1_0", ["s0_0->L0", "L0->S0", "S0->L1", "L1->s1_0"]),
     ("f2", "s0_1", "s2_0", ["s0_1->L0", "L0->S0", "S0->L1", "L1->S1",
-                            "S1->L2", "L2->s2_0"]),       # detour via L1
+                            "S1->L2", "L2->s2_0"]),
     ("f3", "s1_0", "s0_0", ["s1_0->L1", "L1->S1", "S1->L0", "L0->s0_0"]),
     ("f4", "s1_1", "s2_0", ["s1_1->L1", "L1->S1", "S1->L0", "L0->S0",
-                            "S0->L2", "L2->s2_0"]),       # detour via L0
+                            "S0->L2", "L2->s2_0"]),
     ("f5", "s3_0", "s1_0", ["s3_0->L3", "L3->S1", "S1->L1", "L1->s1_0"]),
     ("f6", "s3_1", "s1_0", ["s3_1->L3", "L3->S0", "S0->L1", "L1->s1_0"]),
     ("f7", "s2_1", "s0_0", ["s2_1->L2", "L2->S1", "S1->L0", "L0->s0_0"]),
 ]
 
-# 破解版:f2 改经 L3 中转(切断 S0→L1 ⇒ L1→S1 续接边)→ 依赖图无环
 _BROKEN_F2 = ["s0_1->L0", "L0->S0", "S0->L3", "L3->S1", "S1->L2", "L2->s2_0"]
 
 CYCLE_Q = ["L0->S0", "S0->L1", "L1->S1", "S1->L0"]
@@ -98,7 +96,6 @@ def test_deadlock_freezes_and_breaks():
         sim.run(until=1.0)
         return sim
 
-    # 含环:冻结(四队列互 PAUSE 且非空,流不完成,watchdog 记 storm)
     sim_bad = scenario(False)
     assert not all(f.done for f in sim_bad.flows.values())
     for q in CYCLE_Q:
@@ -106,7 +103,6 @@ def test_deadlock_freezes_and_breaks():
         assert queue.paused and queue.occupancy > 0, f"{q} 未冻结"
     assert sim_bad.metrics.storms >= 4
 
-    # 无环(换一条 detour):全部送达,无冻结
     sim_good = scenario(True)
     assert all(f.done for f in sim_good.flows.values())
     assert not any(q.paused and q.occupancy > 0

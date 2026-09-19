@@ -41,7 +41,7 @@ class ConcedeController:
         self.cap_idx = 0
         self.members = list(ring.servers)
         self._removed = []
-        self.actions = []   # (time, kind, detail)
+        self.actions = []
         self._healthy_since = None
         self._last_action_t = float("-inf")
         self._ticks = 0
@@ -61,11 +61,10 @@ class ConcedeController:
             elif p95 <= self.deadline * self.healthy_ratio:
                 if self._healthy_since is None:
                     self._healthy_since = self.sim.now
-                # epsilon:时刻为浮点累积,严判会把整拍漂移误判为未满
                 if self.sim.now - self._healthy_since >= self.hold_healthy - 1e-9:
                     self._act("restore", p95)
             else:
-                self._healthy_since = None   # 中性带:健康计时作废
+                self._healthy_since = None
         self.sim.schedule((self._ticks + 1) * self.monitor_window, self._tick)
 
     def _act(self, kind, p95):

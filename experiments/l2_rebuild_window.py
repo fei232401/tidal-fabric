@@ -24,7 +24,7 @@ def main():
         dist.init_process_group("nccl", timeout=__import__("datetime").timedelta(seconds=120))
         t_init = time.perf_counter() - t0
         torch.cuda.set_device(rank)
-        x = torch.ones(64 * 1024 * 1024, device=f"cuda:{rank}")  # 64M fp32 = 256MB
+        x = torch.ones(64 * 1024 * 1024, device=f"cuda:{rank}")
         dist.barrier()
         t1 = time.perf_counter()
         dist.all_reduce(x)

@@ -27,7 +27,7 @@ def bench(fn, bytes_moved, warmup=WARMUP, iters=ITERS):
         fn()
     torch.cuda.synchronize()
     dt = (time.perf_counter() - t0) / iters
-    return bytes_moved / dt / 1e9  # GB/s
+    return bytes_moved / dt / 1e9
 
 
 def main():
@@ -36,24 +36,21 @@ def main():
     torch.cuda.set_device(rank)
     out = {"d2d_GBs": {}, "allreduce_GBs": {}}
 
-    # 单卡 D2D(rank0):同卡显存拷贝,带宽上界锚点
     if rank == 0:
         for mb in SIZES_MB:
             n = mb * 1024 * 1024 // 4
             a = torch.ones(n, device="cuda:0")
             b = torch.empty(n, device="cuda:0")
-            # copy 读写各 n*4 字节 → 搬运量 2×
             gbs = bench(lambda: b.copy_(a), 2 * n * 4)
             out["d2d_GBs"][mb] = round(gbs, 1)
             print(f"D2D {mb}MB: {gbs:.0f} GB/s", flush=True)
             del a, b
 
-    # 双卡 all-reduce:环带宽锚点(代数带宽 = 2(N-1)/N × 数据量 / 时间,N=2)
     for mb in SIZES_MB:
         n = mb * 1024 * 1024 // 4
         x = torch.ones(n, device=f"cuda:{rank}")
         dist.barrier()
-        gbs = bench(lambda: dist.all_reduce(x), 2 * n * 4)  # N=2 → 2(N-1)/N=1,搬运 2×数据量(读写)
+        gbs = bench(lambda: dist.all_reduce(x), 2 * n * 4)
         if rank == 0:
             out["allreduce_GBs"][mb] = round(gbs, 1)
             print(f"allreduce {mb}MB: {gbs:.0f} GB/s", flush=True)

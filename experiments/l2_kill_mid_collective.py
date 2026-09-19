@@ -62,11 +62,10 @@ def main():
             [sys.executable, "-c", WORKER], env=dict(env, RANK=str(r)),
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             for r in (0, 1)}
-        time.sleep(random.uniform(2, 5))  # warmup:让 all_reduce 稳定进入循环
+        time.sleep(random.uniform(2, 5))
         procs[1].send_signal(signal.SIGKILL)
         t_kill = time.time()
 
-        # 后台 reader 线程逐行喂 queue,主线程 get(timeout) 轮询真 deadline
         q = queue.Queue()
         threading.Thread(target=lambda: [q.put(l) for l in procs[0].stdout],
                          daemon=True).start()
@@ -77,7 +76,7 @@ def main():
                 line = q.get(timeout=0.2)
             except queue.Empty:
                 if procs[0].poll() is not None:
-                    break  # rank0 已退出且无异常行 → 记录为静默退出(本身是发现)
+                    break
                 continue
             if "RANK0_EXCEPTION" in line:
                 parts = line.strip().split("|")

@@ -9,17 +9,17 @@ from typing import Optional, Tuple
 
 from .pfc import LOSSLESS
 
-DEFAULT_CHUNK_SIZE = 256 * 1024  # 仿真量子(设计文档 §四,M2 必扫)
+DEFAULT_CHUNK_SIZE = 256 * 1024
 
 
 @dataclass
 class Chunk:
     flow_id: str
     size: int
-    path: Tuple               # 有向 Link 序列(整条流共享)
+    path: Tuple
     priority: int = LOSSLESS
-    hop: int = 0              # 当前驻留队列 = path[hop]
-    ingress: Optional[str] = None  # 到达本队列所经链路(源侧为 None)
+    hop: int = 0
+    ingress: Optional[str] = None
     created: float = 0.0
 
 
@@ -36,16 +36,15 @@ class Flow:
         self.priority = priority
         self.chunk_size = chunk_size
         self.key = key or flow_id
-        self.rate_limit = rate_limit   # 源侧限速(bytes/s,None=不限);H2 让渡手段
+        self.rate_limit = rate_limit
         self._next_slot = 0.0
-        # path 可显式注入(自适应/实验场景);缺省最小 ECMP 路由
         self.path = path if path is not None else sim.topo.route(src, dst, self.key)
         self.nic = sim.queue(self.path[0].name, priority)
         self.remaining = total_bytes
         self.bytes_done = 0
         self.started = None
         self.finish = None
-        self.on_finish = None          # 完成回调(RingTraining 用)
+        self.on_finish = None
         self.chunk_latencies = []
         self._waiter_registered = False
         sim.flows[flow_id] = self
@@ -57,7 +56,6 @@ class Flow:
     def _push_more(self):
         self._waiter_registered = False
         while self.remaining > 0:
-            # 源侧限速:未到发送槽位 → 等到槽位再推(与 NIC 空间等待正交)
             if self.rate_limit is not None and self.sim.now < self._next_slot:
                 self.sim.schedule(self._next_slot, self._push_more)
                 return

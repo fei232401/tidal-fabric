@@ -10,7 +10,7 @@ from tidal_fabric.sim import Simulator
 from tidal_fabric.flows import BulkFlow, KVFlow
 
 MB = 1024 * 1024
-TRAIN_BYTES = 1 * 1024 * MB   # 测试用 1GB(3GB 典型值见设计文档,测试取小保速度)
+TRAIN_BYTES = 1 * 1024 * MB
 KV_BYTES = 512 * MB
 
 
@@ -30,5 +30,5 @@ def _kv_latency(with_training: bool) -> float:
 def test_h1_kv_degrades_when_colocated():
     alone = _kv_latency(False)
     shared = _kv_latency(True)
-    assert alone < 0.035            # 独占 ≈ 26ms 量级
-    assert shared > 1.5 * alone     # 共置 ≈ 2×(H1 机理)
+    assert alone < 0.035
+    assert shared > 1.5 * alone

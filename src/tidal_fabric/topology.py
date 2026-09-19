@@ -10,24 +10,24 @@
 from dataclasses import dataclass
 import zlib
 
-SERVER_RATE = 25e9   # 200GbE
-SPINE_RATE = 50e9    # 400GbE
-PROP_DELAY = 20e-6   # 跨架传播延迟量级
+SERVER_RATE = 25e9
+SPINE_RATE = 50e9
+PROP_DELAY = 20e-6
 
 
 @dataclass(frozen=True)
 class Node:
     name: str
-    kind: str  # 'server' | 'leaf' | 'spine'
+    kind: str
 
 
 @dataclass(frozen=True)
 class Link:
-    name: str         # 'src->dst'
+    name: str
     src: str
     dst: str
-    rate: float       # bytes/s
-    prop_delay: float # 秒
+    rate: float
+    prop_delay: float
 
 
 class CLOS:

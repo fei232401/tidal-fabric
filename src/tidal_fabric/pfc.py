@@ -13,11 +13,11 @@
 """
 from collections import deque
 
-LOSSLESS = 3                              # 单一无损优先级:训/推 RDMA 同类 → PFC 连坐(H1 机理)
-DEFAULT_CAPACITY = 16 * 1024 * 1024       # 交换机共享缓冲量级(估算,待扫)
+LOSSLESS = 3
+DEFAULT_CAPACITY = 16 * 1024 * 1024
 DEFAULT_XOFF_RATIO = 0.8
 DEFAULT_XON_RATIO = 0.5
-NIC_CAPACITY = 4 * 1024 * 1024            # NIC 驻留上限 = 源 pacing 窗口(估算,待扫)
+NIC_CAPACITY = 4 * 1024 * 1024
 
 
 class QueueStats:
@@ -25,11 +25,11 @@ class QueueStats:
         self.pushes = 0
         self.departures = 0
         self.max_occupancy = 0
-        self.pause_frames_sent = 0     # 因本队列满而发出的 PAUSE 帧(引用计数 0→1)
+        self.pause_frames_sent = 0
         self.resume_frames_sent = 0
-        self.pauses_received = 0       # 被下游 PAUSE 的次数
-        self.paused_total = 0.0        # 累计被暂停时长(秒)
-        self.storms = 0                # watchdog 触发(≥阈值的长暂停)
+        self.pauses_received = 0
+        self.paused_total = 0.0
+        self.storms = 0
 
     def summary(self):
         return {
@@ -61,16 +61,15 @@ class PortQueue:
         self.xon = capacity * xon_ratio
         self.chunks = deque()
         self.occupancy = 0
-        self.contributors = {}        # ingress 链路名 -> 队内 chunk 数
-        self._paused_ingress = set()  # 本队列已要求暂停的 ingress 链路名
-        self.paused = False           # 被下游 PAUSE
+        self.contributors = {}
+        self._paused_ingress = set()
+        self.paused = False
         self.paused_since = None
         self._storm_flagged = False
         self.transmitting = False
-        self._space_waiters = []      # 等空间的生产者(NIC 源 pacing)
+        self._space_waiters = []
         self.stats = QueueStats()
 
-    # ---- 生产者接口 ----
     def remaining_capacity(self):
         return self.capacity - self.occupancy
 
@@ -86,7 +85,6 @@ class PortQueue:
             self.contributors[chunk.ingress] = self.contributors.get(chunk.ingress, 0) + 1
         if self.occupancy > self.stats.max_occupancy:
             self.stats.max_occupancy = self.occupancy
-        # 已处于暂停水位(含本次越限)→ 立即 PAUSE 该来路(NIC 除外)
         if (not self.is_nic) and chunk.ingress is not None \
                 and self.occupancy >= self.xoff \
                 and chunk.ingress not in self._paused_ingress:
@@ -94,7 +92,6 @@ class PortQueue:
             self.sim.request_pause(self, chunk.ingress)
         self._try_service()
 
-    # ---- 发送 ----
     def _try_service(self):
         if self.paused or self.transmitting or not self.chunks:
             return
@@ -113,21 +110,17 @@ class PortQueue:
                 self.contributors[chunk.ingress] = n
             else:
                 self.contributors.pop(chunk.ingress, None)
-        # 滞回恢复:降到 xon 才放行全部来路
         if (not self.is_nic) and self.occupancy <= self.xon and self._paused_ingress:
             for name in sorted(self._paused_ingress):
                 self.sim.request_resume(self, name)
             self._paused_ingress.clear()
-        # 释放空间 → 唤醒等空间的生产者(源 pacing)
         if self._space_waiters:
             waiters, self._space_waiters = self._space_waiters, []
             for cb in waiters:
                 cb()
-        # 在途 chunk 传播到下一跳
         self.sim.deliver_after(self, chunk)
         self._try_service()
 
-    # ---- 被下游控制 ----
     def set_paused(self, flag):
         if flag and not self.paused:
             self.paused = True

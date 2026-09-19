@@ -34,11 +34,9 @@ KV_CHUNK = 256 * 1024
 KV_DEADLINE = 0.020
 WINDOWS = [(0.0, 3.0, 2.0), (3.0, 7.0, 12.0), (7.0, 10.0, 2.0)]
 FAST_WINDOWS = [(0.0, 2.0, 2.0), (2.0, 4.0, 12.0), (4.0, 6.0, 2.0),
-                (6.0, 8.0, 12.0), (8.0, 10.0, 2.0)]   # 2s 周期快潮汐
+                (6.0, 8.0, 12.0), (8.0, 10.0, 2.0)]
 DURATION = 10.0
 SEED = 42
-# 控制器参数(校准依据:healthy_ratio 0.95 = 19ms,因 KV 独占 p95 地板 17.1ms,
-# 90% 阈值(18ms)在 cap_25 的 18.3ms 之上不可达——写进实验设计文档)
 CTRL_KW = dict(monitor_window=0.5, min_samples=3, min_interval=0.3,
                hold_healthy=1.0, healthy_ratio=0.95,
                cap_levels=(None, 12.5e9, 6.25e9, 3.125e9),
@@ -104,8 +102,6 @@ def main():
         ("net_aware", dict(policy="net_aware")),
         ("net_aware_d200", dict(policy="net_aware", feedback_delay=0.2)),
         ("net_aware_d500", dict(policy="net_aware", feedback_delay=0.5)),
-        # 快潮汐探针:峰值窗口 2s(与滞后 0.5s 可比)→ 验证"滞后伤害在
-        # 时间常数相当时显现"(慢潮汐下被监控窗口吸收 = 上面 d 系列非单调的原因)
         ("fast_tide", dict(policy="net_aware", windows=FAST_WINDOWS)),
         ("fast_tide_d500", dict(policy="net_aware", feedback_delay=0.5,
                                 windows=FAST_WINDOWS)),

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class SimMetrics:
-    storms: int = 0            # watchdog 触发的长暂停事件(全局累计)
+    storms: int = 0
     delivered_chunks: int = 0
 
     def summary(self):

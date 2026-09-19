@@ -17,7 +17,6 @@ def test_ring_steps_and_timing():
     ring.start()
     sim.run(until=0.004)
     assert ring.step_count >= 3
-    # seg = 2×(1/2)×16MB = 16MB;瓶颈 NIC 25GB/s → 0.64ms + 传播 ≈ 0.70ms
     assert all(0.0006 < t < 0.0009 for t in ring.step_times)
 
 
@@ -57,7 +56,7 @@ def test_rate_limit_pacing():
     f.start()
     sim.run(until=0.05)
     assert f.done
-    assert 0.0055 < f.finish < 0.0075   # 64MB/10GB/s = 6.4ms
+    assert 0.0055 < f.finish < 0.0075
 
 
 def test_h2_cap_protects_kv():
@@ -75,5 +74,5 @@ def test_h2_cap_protects_kv():
 
     kv_full, train_full = scenario(None)
     kv_capped, train_capped = scenario(4e9)
-    assert kv_capped < kv_full        # H2:通信让渡 → KV 恢复
-    assert train_capped > train_full  # 代价:训练变慢
+    assert kv_capped < kv_full
+    assert train_capped > train_full

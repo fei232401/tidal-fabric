@@ -21,14 +21,13 @@ class Simulator:
         self.rng = random.Random(seed)
         self.watchdog_threshold = watchdog_threshold
         self.queues = {}
-        self._pause_refs = {}   # (ingress_link, priority) -> set(下游队列链路名)
+        self._pause_refs = {}
         self.flows = {}
         self.metrics = SimMetrics()
         self._event_count = 0
 
-    # ---- 基础设施 ----
     def schedule(self, time, action):
-        if time < self.now:          # 防御:控制帧/传播计算的理论边界
+        if time < self.now:
             time = self.now
         self.events.schedule(time, action)
 
@@ -42,7 +41,6 @@ class Simulator:
             self.queues[key] = q
         return q
 
-    # ---- PFC 帧仲裁(引用计数) ----
     def request_pause(self, downstream_queue, ingress_name):
         key = (ingress_name, downstream_queue.priority)
         refs = self._pause_refs.setdefault(key, set())
@@ -73,7 +71,6 @@ class Simulator:
 
             self.schedule(self.now + prop, deliver_resume)
 
-    # ---- chunk 传递 ----
     def deliver_after(self, queue, chunk):
         link = queue.link
 
@@ -93,7 +90,6 @@ class Simulator:
         if flow is not None:
             flow.on_delivered(chunk)
 
-    # ---- 主循环 ----
     def run(self, until=None, max_events=10_000_000):
         while len(self.events):
             t = self.events.peek_time()

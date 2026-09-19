@@ -24,8 +24,8 @@ def test_controller_net_aware_concede_restore():
     """违约 → 连降三档到底;健康持续 → 逐档归还(滞回)。"""
     topo = CLOS(n_leaf=2, n_spine=1, servers_per_leaf=1)
     sim = Simulator(topo)
-    ring = RingTraining(sim, ["s0_0", "s1_0"], 2 * MB)  # 不 start:只当执行器
-    flows = [_StubFlow(t, 0.05) for t in (0.05, 0.15, 0.25, 0.35)]   # 违约期
+    ring = RingTraining(sim, ["s0_0", "s1_0"], 2 * MB)
+    flows = [_StubFlow(t, 0.05) for t in (0.05, 0.15, 0.25, 0.35)]
     flows += [_StubFlow(t, 0.005) for t in (0.45, 0.55, 0.65, 0.75, 0.85, 0.95)]
     ctrl = ConcedeController(sim, _StubKV(flows), ring, deadline=0.02,
                              policy="net_aware", monitor_window=0.1,
@@ -33,7 +33,7 @@ def test_controller_net_aware_concede_restore():
     sim.run(until=1.05)
     kinds = [k for _, k, _ in ctrl.actions]
     assert kinds == ["concede", "concede", "concede", "restore", "restore"]
-    assert ring.rate_limit == 12.5e9   # 三降两升:idx 3 → 1
+    assert ring.rate_limit == 12.5e9
 
 
 def test_controller_view_lag_visibility():
@@ -50,8 +50,8 @@ def test_controller_view_lag_visibility():
         assert len(ctrl.actions) == 1
         return ctrl.actions[0][0]
 
-    assert first_action_time(0.0) == 0.5     # 无延迟:finish 当拍可见
-    assert first_action_time(0.2) == 0.7     # 延迟 0.2s:拖两拍到 0.7 才可见
+    assert first_action_time(0.0) == 0.5
+    assert first_action_time(0.2) == 0.7
 
 
 def test_gpu_only_concede_restore():
@@ -59,7 +59,7 @@ def test_gpu_only_concede_restore():
     topo = CLOS(n_leaf=4, n_spine=1, servers_per_leaf=1)
     sim = Simulator(topo)
     ring = RingTraining(sim, ["s0_0", "s1_0", "s2_0", "s3_0"], 2 * MB)
-    flows = [_StubFlow(0.05, 0.05), _StubFlow(0.15, 0.05)]          # 违约期
+    flows = [_StubFlow(0.05, 0.05), _StubFlow(0.15, 0.05)]
     flows += [_StubFlow(t, 0.005) for t in (0.45, 0.55, 0.65, 0.75,
                                             0.85, 0.95, 1.05, 1.15)]
     ctrl = ConcedeController(sim, _StubKV(flows), ring, deadline=0.02,
@@ -81,14 +81,14 @@ def test_ring_rebuild_safe_point():
     sim = Simulator(topo)
     ring = RingTraining(sim, ["s0_0", "s1_0", "s2_0", "s3_0"], 4 * MB)
     ring.start()
-    sim.run(until=0.0002)                      # 第一步进行中
+    sim.run(until=0.0002)
     ring.request_rebuild(["s0_0", "s1_0", "s2_0"], rebuild_time=0.001)
     sim.run(until=0.02)
     assert ring.rebuilds == 1
     assert ring.n == 3
     assert ring.stall_total == 0.001
     assert ring.servers == ["s0_0", "s1_0", "s2_0"]
-    assert all(t < 0.002 for t in ring.step_times)   # 无异常长步(没撞 collective)
+    assert all(t < 0.002 for t in ring.step_times)
 
 
 def test_ring_rate_limit_applies_next_step():
@@ -102,4 +102,4 @@ def test_ring_rate_limit_applies_next_step():
     ring.set_rate_limit(10e9)
     sim.run(until=0.02)
     capped = ring.step_times[-1]
-    assert capped > full * 2                   # 16MB/10GB/s ≈ 1.6ms vs 0.7ms
+    assert capped > full * 2

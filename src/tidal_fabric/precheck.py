@@ -37,7 +37,7 @@ def find_cycle(edges):
         adj.setdefault(a, set()).add(b)
         nodes.add(a)
         nodes.add(b)
-    color = {n: 0 for n in nodes}   # 0 白 / 1 灰(在栈上) / 2 黑
+    color = {n: 0 for n in nodes}
     parent = {}
     for start in sorted(nodes):
         if color[start]:
@@ -55,7 +55,6 @@ def find_cycle(edges):
                     pushed = True
                     break
                 if color[nxt] == 1:
-                    # 灰邻居 = 当前 DFS 路径上的祖先 → 回边成环
                     cyc = [node]
                     cur = node
                     while cur != nxt:

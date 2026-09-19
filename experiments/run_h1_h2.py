@@ -22,15 +22,15 @@ from tidal_fabric.sim import Simulator
 from tidal_fabric.workloads import RingTraining, TidalKVWorkload
 from tidal_fabric.stats import percentile, mean
 
-SPINE_RATE = 30e9                 # 上联 30GB/s:与双 NIC(25+25)构成共享瓶颈
-GRAD_BYTES = 100 * 1024 * 1024    # 每卡梯度 100MB(~50M 参数 bf16,估算)
-RING_CHUNK = 2 * 1024 * 1024      # 大象流量子(设计文档 §三)
-RING_SERVERS = ["s0_0", "s1_0", "s2_0", "s3_0"]   # 一 leaf 一 rank(gang 语义)
-KV_SRC, KV_DST = "s0_1", "s1_1"   # prefill/decode 对,与 ring 段 A 共享两条链路
+SPINE_RATE = 30e9
+GRAD_BYTES = 100 * 1024 * 1024
+RING_CHUNK = 2 * 1024 * 1024
+RING_SERVERS = ["s0_0", "s1_0", "s2_0", "s3_0"]
+KV_SRC, KV_DST = "s0_1", "s1_1"
 KV_BYTES = 256 * 1024 * 1024
 KV_CHUNK = 256 * 1024
-KV_DEADLINE = 0.020               # 20ms TTFT SLO(首轮数字校准,见实验设计)
-WINDOWS = [(0.0, 3.0, 2.0), (3.0, 7.0, 12.0), (7.0, 10.0, 2.0)]  # 谷-峰-谷
+KV_DEADLINE = 0.020
+WINDOWS = [(0.0, 3.0, 2.0), (3.0, 7.0, 12.0), (7.0, 10.0, 2.0)]
 DURATION = 10.0
 SEED = 42
 CAPS = {"cap_75": 0.75 * 25e9, "cap_50": 0.5 * 25e9, "cap_25": 0.25 * 25e9}

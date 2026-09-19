@@ -120,8 +120,6 @@ class RingTraining:
                 self.progress_bytes += 2 * (self.n - 1) * self.grad_bytes
                 delay = self.compute_time
                 if self._pending_servers is not None:
-                    # 重建停摆在步间(不进 step_times);若请求落在停摆窗口内,
-                    # 下一轮步间才补停摆(边角情形,影响 < 一步)
                     delay = self._pending_rebuild_time
                     self.stall_total += self._pending_rebuild_time
                 self.sim.schedule(self.sim.now + delay, self._begin_step)

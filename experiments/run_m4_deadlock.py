@@ -33,7 +33,7 @@ GRAD_BYTES = 100 * 1024 * 1024
 RING_SERVERS = ["s0_0", "s1_0", "s2_0", "s3_0"]
 KV_SRC, KV_DST = "s0_1", "s1_1"
 KV_BYTES = 128 * 1024 * 1024
-KV_RATE = 8.0            # 常率受害流(本实验量死锁,不量 SLO)
+KV_RATE = 8.0
 DURATION = 1.2
 REROLL_INTERVAL = 0.1
 P_VALUES = [0.0, 0.25, 0.5, 0.75, 1.0]
@@ -148,7 +148,7 @@ def bench_precheck_latency():
     router = ScanRouter(topo, RING_SERVERS, 1.0, random.Random(1), False,
                         topo.route(KV_SRC, KV_DST, "kv"))
     paths = router._candidate(0) + [topo.route(KV_SRC, KV_DST, "kv")]
-    precheck_routes(paths)                      # 预热
+    precheck_routes(paths)
     t0 = time.perf_counter()
     n = 1000
     for _ in range(n):
